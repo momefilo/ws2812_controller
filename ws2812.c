@@ -8,34 +8,49 @@ uint32_t *led_buf;
 uint pattern = 2, counter = 0, colorcounter = 0;
 uint8_t Green = 0, Red = 0, Blue = 0;
 
-char menu_txt[8][5]={
-	"NrLED",
-	"Helkt",
-	"Speed",
-	"Progr",
-	"Set  ",
-	"Gruen",
-	"Rot  ",
-	"Blau ",
+/* Parameter welche im Menu angezeigt werden */
+#define NUMLED 0
+#define HELLIGKEIT 1
+#define SPEED 2
+#define PROG 3
+#define SET 4
+#define GREEN 5
+#define RED 6
+#define BLUE 7
+
+char Para_txt[8][5]={
+	"NrLED", // Anzahl der LEDs
+	"Helkt", // Helligkeit
+	"Speed", // Geschwindigkeit des Farbwechsels
+	"Progr", // Das Pattern
+	"Set  ", // Uebernahme der Werte
+	"Gruen", // Helligkeit des Gruenanteils in einem der Pattern
+	"Rot  ", // Helligkeit des Rotanteils in einem der Pattern
+	"Blau ", // Helligkeit des Blauanteils in einem der Pattern
 };
-uint8_t menu_num[] = {16, 0x1F, 32, 0, 0, 0xFF, 0xFF, 0xFF};
+
+/* Die (start-) Werte zu den Parametern in Para_txt*/
+uint8_t Para_wert[] = {16, 0x1F, 32, 0, 0, 0x09, 0x09, 0x09};
+
+/* Der aktuell ausgewaehlte Parameter */
 uint8_t selection = 0;
+
 void write_menu(){
 	for(int i=0; i<8; i++){
 		bool sel = false;
 		if(i==selection) sel = true;
 		uint8_t pos[] = {i, 0};
-		Display_WriteText(pos, menu_txt[i], 5, sel);
+		Display_WriteText(pos, Para_txt[i], 5, sel);
 		pos[1] = 6;
 		char tmp[4];
-		sprintf(tmp,"0x%02x",menu_num[i]);
+		sprintf(tmp,"0x%02x",Para_wert[i]);
 		Display_WriteText(pos, tmp, 4, sel);
 	}
 }
 
 void write_pattern(){
-	uint summand = menu_num[1] / 21;
-	uint8_t left_bits = 0, middle_bits = 0, right_bits = menu_num[1];
+	uint summand = Para_wert[HELLIGKEIT] / 21;
+	uint8_t left_bits = 0, middle_bits = 0, right_bits = Para_wert[HELLIGKEIT];
 	uint i = 0;
 	for(int k=0; k<8; k++){
 		for(int l=0; l<8; l++){
@@ -84,87 +99,87 @@ void shift_pattern(){
 }
 
 void writeRGB(){
-	for(int i=0; i<menu_num[0]; i++){
-		led_buf[i] = menu_num[5]<<24 | menu_num[6]<<16 | menu_num[7]<<8;
+	for(int i=0; i<Para_wert[NUMLED]; i++){
+		led_buf[i] = Para_wert[GREEN]<<24 | Para_wert[RED]<<16 | Para_wert[BLUE]<<8;
 	}
 }
 void change_grbbuf(){
-	if(colorcounter < 1){ Green = menu_num[1]-1; Red = 0; Blue = 0;}
-	else if(colorcounter < menu_num[1] && Red < menu_num[1]) Red++;
-	else if(colorcounter < 2*menu_num[1] && Green > 0) Green--;
-	else if(colorcounter < 3*menu_num[1] && Blue < menu_num[1]) Blue++;
-	else if(colorcounter < 4*menu_num[1] && Red > 0) Red--;
-	else if(colorcounter < 5*menu_num[1] && Green < menu_num[1]) Green++;
-	else if(colorcounter < 6*menu_num[1] && Blue > 0) Blue--;
-	for(int i=0; i<menu_num[0]; i++){
+	if(colorcounter < 1){ Green = Para_wert[HELLIGKEIT]-1; Red = 0; Blue = 0;}
+	else if(colorcounter < Para_wert[HELLIGKEIT] && Red < Para_wert[HELLIGKEIT]) Red++;
+	else if(colorcounter < 2*Para_wert[HELLIGKEIT] && Green > 0) Green--;
+	else if(colorcounter < 3*Para_wert[HELLIGKEIT] && Blue < Para_wert[HELLIGKEIT]) Blue++;
+	else if(colorcounter < 4*Para_wert[HELLIGKEIT] && Red > 0) Red--;
+	else if(colorcounter < 5*Para_wert[HELLIGKEIT] && Green < Para_wert[HELLIGKEIT]) Green++;
+	else if(colorcounter < 6*Para_wert[HELLIGKEIT] && Blue > 0) Blue--;
+	for(int i=0; i<Para_wert[NUMLED]; i++){
 		led_buf[i] = (Green << 24) | (Red << 16) | (Blue << 8);
 	}
 	colorcounter++;
-	if(colorcounter >= 6*menu_num[1]) colorcounter = 0;
+	if(colorcounter >= 6*Para_wert[HELLIGKEIT]) colorcounter = 0;
 }
 void make_pattern(){
-	if(menu_num[3]>15 && menu_num[3]<31){
-		uint8_t byte_l = menu_num[1], byte_m = menu_num[1], byte_r = 0;
+	if(Para_wert[PROG]>15 && Para_wert[PROG]<31){
+		uint8_t byte_l = Para_wert[HELLIGKEIT], byte_m = Para_wert[HELLIGKEIT], byte_r = 0;
 		int z = 7;
-		for(int i=0; i<menu_num[0]; i++){
+		for(int i=0; i<Para_wert[NUMLED]; i++){
 			led_buf[z] = (byte_l << 24) | (byte_m << 16) | (byte_r << 8);
 			z++;
-			if(z>menu_num[0]-1) z = 0;
-			if(i < menu_num[0]/3){
-				byte_m = byte_m - menu_num[1]/(menu_num[0]/3);
-				byte_r = byte_r + menu_num[1]/(menu_num[0]/3);
+			if(z>Para_wert[NUMLED]-1) z = 0;
+			if(i < Para_wert[NUMLED]/3){
+				byte_m = byte_m - Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
+				byte_r = byte_r + Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
 			}
-			else if(i < (menu_num[0]/3)*2){
-				byte_l = byte_l - menu_num[1]/(menu_num[0]/3);
-				byte_m = byte_m + menu_num[1]/(menu_num[0]/3);
+			else if(i < (Para_wert[NUMLED]/3)*2){
+				byte_l = byte_l - Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
+				byte_m = byte_m + Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
 			}
 			else{
-				byte_r = byte_r - menu_num[1]/(menu_num[0]/3);
-				byte_l = byte_l + menu_num[1]/(menu_num[0]/3);
+				byte_r = byte_r - Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
+				byte_l = byte_l + Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
 			}
 		}
 	}
 	else{
-		uint8_t byte_l = menu_num[1], byte_m = 0, byte_r = 0;
+		uint8_t byte_l = Para_wert[HELLIGKEIT], byte_m = 0, byte_r = 0;
 		int z = 7;
-		for(int i=0; i<menu_num[0]; i++){
+		for(int i=0; i<Para_wert[NUMLED]; i++){
 			led_buf[z] = (byte_l << 24) | (byte_m << 16) | (byte_r << 8);
 			z++;
-			if(z>menu_num[0]-1) z = 0;
-			if(i < menu_num[0]/3){
-				byte_l = byte_l - menu_num[1]/(menu_num[0]/3);
-				byte_m = byte_m + menu_num[1]/(menu_num[0]/3);
+			if(z>Para_wert[NUMLED]-1) z = 0;
+			if(i < Para_wert[NUMLED]/3){
+				byte_l = byte_l - Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
+				byte_m = byte_m + Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
 			}
-			else if(i < (menu_num[0]/3)*2){
-				byte_m = byte_m - menu_num[1]/(menu_num[0]/3);
-				byte_r = byte_r + menu_num[1]/(menu_num[0]/3);
+			else if(i < (Para_wert[NUMLED]/3)*2){
+				byte_m = byte_m - Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
+				byte_r = byte_r + Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
 			}
 			else{
-				byte_r = byte_r - menu_num[1]/(menu_num[0]/3);
-				byte_l = byte_l + menu_num[1]/(menu_num[0]/3);
+				byte_r = byte_r - Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
+				byte_l = byte_l + Para_wert[HELLIGKEIT]/(Para_wert[NUMLED]/3);
 			}
 		}
 	}
 }
 void shift_grbbuf(){
 	uint32_t tmp = led_buf[0];
-	for(int i=0; i<menu_num[0]-1; i++) led_buf[i] = led_buf[i+1];
-	led_buf[menu_num[0]-1] = tmp;
+	for(int i=0; i<Para_wert[NUMLED]-1; i++) led_buf[i] = led_buf[i+1];
+	led_buf[Para_wert[NUMLED]-1] = tmp;
 }
 void buf_init(){
-	led_buf = realloc(led_buf, menu_num[0]*sizeof(uint32_t));
-	if(menu_num[3]>0)make_pattern();
+	led_buf = realloc(led_buf, Para_wert[NUMLED]*sizeof(uint32_t));
+	if(Para_wert[PROG]>0)make_pattern();
 	else change_grbbuf();
-	dma_channel_set_trans_count(dma_chan, menu_num[0], true);
+	dma_channel_set_trans_count(dma_chan, Para_wert[NUMLED], true);
 }
 void dma_handle(){
 	dma_hw->ints0 = 1u << dma_chan;// clear the irq
 	pio_sm_exec(pio, sm, ws2812_set_bits(pio_offset));
 	dma_channel_set_read_addr(dma_chan, &led_buf[0], true);
-	if(counter >= menu_num[2]){
+	if(counter >= Para_wert[SPEED]){
 		counter = 0;
-		if(menu_num[3]<1)change_grbbuf();
-		else if(menu_num[3]<31)shift_grbbuf();
+		if(Para_wert[PROG]<1)change_grbbuf();
+		else if(Para_wert[PROG]<31)shift_grbbuf();
 		else writeRGB();
 	}
 	counter++;
@@ -179,18 +194,18 @@ void set_direction(uint gpio, uint32_t events){
 			else selection = 7;
 		}
 		if(gpio == BUTTON_R){
-			if(menu_num[selection] < 0xEF) menu_num[selection] = menu_num[selection] + 16;
-			else if(menu_num[selection] < 0xFF) menu_num[selection] = menu_num[selection] + 1;
+			if(Para_wert[selection] < 0xEF) Para_wert[selection] = Para_wert[selection] + 16;
+			else if(Para_wert[selection] < 0xFF) Para_wert[selection] = Para_wert[selection] + 1;
 			if(selection==4){
 				buf_init();
-				menu_num[4] = 0;
+				Para_wert[SET] = 0;
 			}
 		 }
 		if(gpio == BUTTON_L){
-			if(menu_num[selection] > 0x10 && selection>0){
-				menu_num[selection] = menu_num[selection] - 16;
+			if(Para_wert[selection] > 0x10 && selection>0){
+				Para_wert[selection] = Para_wert[selection] - 16;
 			}
-			else if(menu_num[selection] > 0x0) menu_num[selection] = menu_num[selection] - 1;
+			else if(Para_wert[selection] > 0x0) Para_wert[selection] = Para_wert[selection] - 1;
 		}
 		write_menu();
 }
@@ -214,7 +229,7 @@ int main() {
     stdio_init_all();
     mygpio_init();
     Display_init();
-    led_buf = calloc(menu_num[0], sizeof(uint32_t));
+    led_buf = calloc(Para_wert[NUMLED], sizeof(uint32_t));
     buf_init();
     write_menu();
 
@@ -230,7 +245,7 @@ int main() {
     dma_channel_configure(dma_chan, &dma_cfg,
 		&pio0_hw->txf[0],	//destination
 		NULL,				//source
-		menu_num[0],			//counts before call irq
+		Para_wert[NUMLED],			//counts before call irq
 		false				//don't start yet
 	);
 	dma_channel_set_irq0_enabled(dma_chan, true);

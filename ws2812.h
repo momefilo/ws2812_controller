@@ -15,7 +15,7 @@
 #define BUTTON_U 9
 #define BUTTON_D 8
 
-
+// Patterns fuer 8x8 Matrix-LEDs
 uint8_t PATTERNS[3][8][8]={
 {	// streifen
 	{54,55,56,57,58,59,60,61},
