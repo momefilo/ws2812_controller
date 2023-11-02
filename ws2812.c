@@ -1,4 +1,12 @@
+//moefilo Desing
 #include "ws2812.h"
+
+/* Das Programm baut auf der Beispielanwendung des Raspberry Pi SDK auf und benutzt die
+ * PIO Statemachine des Pico. Ein ST7735-Display (160x128 pixel)
+ * und vier Taster bilden die Menuefuerung des Programms mit dem ein Regenbogenmuster,
+ * drei speziell fuer 8x8-Matrix-Leds entwickelten Patterns, sowie mittels direkter
+ * RGB-Farbwertvorgabe die Anzahl eingestellter LEDs angesteuert werden */
+
 uint dma_chan;
 uint pio_offset;
 PIO pio = pio0;
