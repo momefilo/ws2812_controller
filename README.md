@@ -8,7 +8,8 @@ Die Pinbelegung ist in der "ws2812.h" Headerdatei definiert
 
 Die Parameterauwahl erfolgt mit den UP/DOWN-, die Wertverstellung mit LEFT/RIGHT tastern
 in Hexadezimaler darstellung. Die Wertverstellung nach oben summiert Werte mit 16, nach unten
-erfolgt Sie in Einzelschritten. Damit sind hohe Werte einfacher einzugeben :)
+erfolgt Sie in Einzelschritten. Damit sind hohe Werte einfacher einzugeben :)\
+Es gibt drei Programme die ueber "Prog" mit Werten = 0, >0&&<31 sowie >30 Ausgewählt werden koennen\
 
 "NrLED" ist die Anzahl der ws2812-leds die angesteuert werden\
 "Helkt" ist die Helligkeit mit der die LEDs angesteuert werden\
