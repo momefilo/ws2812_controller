@@ -15,7 +15,7 @@ Es gibt drei Programme die ueber "Prog" mit Werten = 0, >0&&<31 sowie >30 Ausgew
 "Helkt" ist die Helligkeit mit der die LEDs angesteuert werden\
 "Speed" ist die Geschwindigkeit des Farbwechsels\
 "Progr" ist das Pattern welches benutzt wird (siehe weiter unten)\
-"Set"	uebernimmt die Werte "Speed" und "Prog", die anderen Werte wirken direkt ohne Uebernahme\
+"Set"	uebernimmt die Werte "NrLED" und "Prog", die anderen Werte wirken direkt ohne Uebernahme\
 "Gruen","Rot","Blau" Wenn der Wert des Parameters "Prog" >30 ist wird der hiermit eingestellte\
 Farbwert mit der Helligkeit "Helkt" an die LEDs gesendet\
 \
