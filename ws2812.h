@@ -7,7 +7,6 @@
 #include "include/display.h"
 #include "ws2812.pio.h"
 
-//#define NUM_LEDS 16
 #define WS2812_PIN 27
 
 #define BUTTON_R 6
