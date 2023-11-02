@@ -3,7 +3,7 @@ Das Programm baut auf der Beispielanwendung des Raspberry Pi SDK auf und benutzt
 PIO Statemachine des Pico. Ein ST7735-Display (160x128 pixel)
 und vier Taster bilden die Menuefuerung des Programms mit dem ein Regenbogenmuster,
 drei speziell fuer 8x8-Matrix-Leds entwickelten Patterns, sowie mittels direkter
-RGB-Farbwertvorgabe die Anzahl eingestellter LEDs angesteuert werden
+RGB-Farbwertvorgabe die Anzahl eingestellter LEDs angesteuert werden.
 Die Pinbelegung ist in der "ws2812.h" Headerdatei definiert
 
 Die Parameterauwahl erfolgt mit den UP/DOWN-, die Wertverstellung mit LEFT/RIGHT tastern
@@ -20,11 +20,14 @@ Es gibt drei Programme die ueber "Prog" mit Werten = 0, >0&&<31 sowie >30 Ausgew
 Farbwert mit der Helligkeit "Helkt" an die LEDs gesendet\
 \
 -PROG Wert = 0\
+ist ein einfacher Regenbogen-Farbwechsel
+
+-PROG Wert >0 && < 16\
 ist ein Pattern fuer 8x8-Matrix-Leds. die Programmvariable "pattern=2" kann aus drei in der
 Headerdatei "ws2812.h" definierten Patterns neu kompiliert werden
 
-PROG Wert > 0 && PROG Wert < 31\
-Ein Regenbogenpattern
+PROG Wert > 15 && PROG Wert < 31\
+Ein Regenbogen-Lauflicht
 
-PROG Wert > 30\
+PROG Wert > 32\
 Die mit den Parametern "Gruen", "Rot" und "Blau" eingestellte Farbe wird an die LEDs gesendet
